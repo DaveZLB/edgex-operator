@@ -1,0 +1,241 @@
+apiVersion: vmware.com/v1alpha1
+kind: EdgeX
+metadata:
+  name: example-edgex
+spec:
+  # Default values copied from <project_dir>/helm-charts/EdgeX/values.yaml
+  
+  edgex:
+    app:
+      appservice:
+        rules: edgex-app-service-configurable-rules
+      core:
+        command: edgex-core-command
+        consul: edgex-core-consul
+        data: edgex-core-data
+        metadata: edgex-core-metadata
+      device:
+        rest: edgex-device-rest
+        virtual: edgex-device-virtual
+      redis: edgex-redis
+      support:
+        notifications: edgex-support-notifications
+        rulesengine: edgex-support-rulesengine
+        scheduler: edgex-support-scheduler
+      system: edgex-sys-mgmt-agent
+      ui: edgex-ui
+    image:
+      appservice:
+        rules:
+          pullPolicy: IfNotPresent
+          repository: edgexfoundry/docker-app-service-configurable
+          tag: 1.2.0
+      core:
+        command:
+          pullPolicy: IfNotPresent
+          repository: edgexfoundry/docker-core-command-go
+          tag: 1.2.1
+        consul:
+          pullPolicy: IfNotPresent
+          repository: edgexfoundry/docker-edgex-consul
+          tag: 1.2.0
+        data:
+          pullPolicy: IfNotPresent
+          repository: edgexfoundry/docker-core-data-go
+          tag: 1.2.1
+        metadata:
+          pullPolicy: IfNotPresent
+          repository: edgexfoundry/docker-core-metadata-go
+          tag: 1.2.1
+      device:
+        rest:
+          pullPolicy: IfNotPresent
+          repository: edgexfoundry/docker-device-rest-go
+          tag: 1.1.1
+        virtual:
+          pullPolicy: IfNotPresent
+          repository: edgexfoundry/docker-device-virtual-go
+          tag: 1.2.1
+      redis:
+        pullPolicy: IfNotPresent
+        repository: quay.io/smile/redis
+        tag: 4.0.6r2
+      support:
+        notifications:
+          pullPolicy: IfNotPresent
+          repository: edgexfoundry/docker-support-notifications-go
+          tag: 1.2.1
+        rulesengine:
+          pullPolicy: IfNotPresent
+          repository: emqx/kuiper
+          tag: 0.4.2-alpine
+        scheduler:
+          pullPolicy: IfNotPresent
+          repository: edgexfoundry/docker-support-scheduler-go
+          tag: 1.2.1
+      system:
+        pullPolicy: IfNotPresent
+        repository: edgexfoundry/docker-sys-mgmt-agent-go
+        tag: 1.2.1
+      ui:
+        pullPolicy: IfNotPresent
+        repository: edgexfoundry/docker-edgex-ui-go
+        tag: 1.2.1
+    replicas:
+      appservice:
+        rules: 1
+      core:
+        command: 1
+        consul: 1
+        data: 1
+        metadata: 1
+      device:
+        rest: 1
+        virtual: 1
+      redis: 3
+      support:
+        notifications: 1
+        rulesengine: 1
+        scheduler: 1
+      system: 1
+      ui: 1
+    resources:
+      appservice:
+        rules:
+          enforceLimits: false
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+      core:
+        command:
+          enforceLimits: false
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+        consul:
+          enforceLimits: false
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+        data:
+          enforceLimits: false
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+        metadata:
+          enforceLimits: false
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+      device:
+        rest:
+          enforceLimits: false
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+        virtual:
+          enforceLimits: false
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+      redis:
+        sentinel:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        server:
+          limits:
+            memory: 700Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+      support:
+        notifications:
+          enforceLimits: false
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+        rulesengine:
+          enforceLimits: false
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+        scheduler:
+          enforceLimits: false
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+      system:
+        enforceLimits: false
+        limits:
+          cpu: 1
+          memory: 512Mi
+        requests:
+          cpu: 0.5
+          memory: 256Mi
+      ui:
+        enforceLimits: false
+        limits:
+          cpu: 1
+          memory: 512Mi
+        requests:
+          cpu: 0.5
+          memory: 256Mi
+  expose:
+    nodePort:
+      appservice:
+        rules: 30100
+      core:
+        command: 30082
+        consul: 30850
+        data: 30080
+        metadata: 30081
+      device:
+        rest: 31986
+        virtual: 31990
+      redis: 30079
+      support:
+        notifications: 30060
+        rulesengine: 30075
+        scheduler: 30085
+      system: 30090
+      ui: 30400
+    type: NodePort
+  rbac:
+    create: true
+  serviceAccount:
+    create: true
+    name: null
+  

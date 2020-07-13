@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    org.edgexfoundry.service: {{.Values.edgex.app.core.metadata}}
+  name: {{.Values.edgex.app.core.metadata}}
+spec:
+  replicas: {{.Values.edgex.replicas.core.metadata}}
+  selector:
+    matchLabels:
+      org.edgexfoundry.service: {{.Values.edgex.app.core.metadata}}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        org.edgexfoundry.service: {{.Values.edgex.app.core.metadata}}
+    spec:
+      containers:
+      - name: {{.Values.edgex.app.core.metadata}}
+        image: {{.Values.edgex.image.core.metadata.repository}}:{{.Values.edgex.image.core.metadata.tag}}
+        imagePullPolicy: {{.Values.edgex.image.core.metadata.pullPolicy}}
+        ports:
+        - containerPort: 48081
+        envFrom:
+        - configMapRef:
+            name: edgex-common-variables
+        env:
+        - name: Service_Host
+          value: {{.Values.edgex.app.core.metadata}}
+        - name: Notifications_Sender
+          value: {{.Values.edgex.app.core.metadata}}
+        readinessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: 48081
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: 48081
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 3
+      {{- if .Values.edgex.resources.core.metadata.enforceLimits }}
+        resources:
+          limits:
+            memory: {{ .Values.edgex.resources.core.metadata.limits.memory }}
+            cpu: {{ .Values.edgex.resources.core.metadata.limits.cpu }}
+          requests:
+            memory: {{ .Values.edgex.resources.core.metadata.requests.memory }}
+            cpu: {{ .Values.edgex.resources.core.metadata.requests.cpu }}
+      {{- end}}
+      hostname: {{.Values.edgex.app.core.metadata}}
+      restartPolicy: Always
+status: {}

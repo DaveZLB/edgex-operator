@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    org.edgexfoundry.service: {{.Values.edgex.app.system}}
+  name: {{.Values.edgex.app.system}}
+spec:
+  replicas: {{.Values.edgex.replicas.system}}
+  selector:
+    matchLabels:
+      org.edgexfoundry.service: {{.Values.edgex.app.system}}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        org.edgexfoundry.service: {{.Values.edgex.app.system}}
+    spec:
+      containers:
+      - name: {{.Values.edgex.app.system}}
+        image: {{.Values.edgex.image.system.repository}}:{{.Values.edgex.image.system.tag}}
+        imagePullPolicy: {{.Values.edgex.image.system.pullPolicy}}
+        ports:
+        - containerPort: 48090
+        envFrom:
+        - configMapRef:
+            name: edgex-common-variables
+        env:
+        - name: Service_Host
+          value: {{.Values.edgex.app.system}}
+        - name: ExecutorPath
+          value: "/sys-mgmt-executor"
+        - name: MetricsMechanism
+          value: "executor"
+        readinessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: 48090
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: 48090
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 3
+      {{- if .Values.edgex.resources.system.enforceLimits }}
+        resources:
+          limits:
+            memory: {{ .Values.edgex.resources.system.limits.memory }}
+            cpu: {{ .Values.edgex.resources.system.limits.cpu }}
+          requests:
+            memory: {{ .Values.edgex.resources.system.requests.memory }}
+            cpu: {{ .Values.edgex.resources.system.requests.cpu }}
+      {{- end}}
+      hostname: {{.Values.edgex.app.system}}
+      restartPolicy: Always
+status: {}

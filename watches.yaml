@@ -1,0 +1,5 @@
+---
+- group: vmware.com
+  version: v1alpha1
+  kind: EdgeX
+  chart: helm-charts/EdgeX

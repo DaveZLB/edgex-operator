@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    org.edgexfoundry.service: {{.Values.edgex.app.support.scheduler}}
+  name: {{.Values.edgex.app.support.scheduler}}
+spec:
+  replicas: {{.Values.edgex.replicas.support.scheduler}}
+  selector:
+    matchLabels:
+      org.edgexfoundry.service: {{.Values.edgex.app.support.scheduler}}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        org.edgexfoundry.service: {{.Values.edgex.app.support.scheduler}}
+    spec:
+      containers:
+      - name: {{.Values.edgex.app.support.scheduler}}
+        image: {{.Values.edgex.image.support.scheduler.repository}}:{{.Values.edgex.image.support.scheduler.tag}}
+        imagePullPolicy: {{.Values.edgex.image.support.scheduler.pullPolicy}}
+        ports:
+        - containerPort: 48085
+        envFrom:
+        - configMapRef:
+            name: edgex-common-variables
+        env:
+        - name: Service_Host
+          value: {{.Values.edgex.app.support.scheduler}}
+        - name: IntervalActions_ScrubPushed_Host
+          value: {{.Values.edgex.app.core.data}}
+        - name: IntervalActions_ScrubAged_Host
+          value: {{.Values.edgex.app.core.data}}
+        readinessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: 48085
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: 48085
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 3
+      {{- if .Values.edgex.resources.support.scheduler.enforceLimits }}
+        resources:
+          limits:
+            memory: {{ .Values.edgex.resources.support.scheduler.limits.memory }}
+            cpu: {{ .Values.edgex.resources.support.scheduler.limits.cpu }}
+          requests:
+            memory: {{ .Values.edgex.resources.support.scheduler.requests.memory }}
+            cpu: {{ .Values.edgex.resources.support.scheduler.requests.cpu }}
+      {{- end}}
+      hostname: {{.Values.edgex.app.support.scheduler}}
+      restartPolicy: Always
+status: {}

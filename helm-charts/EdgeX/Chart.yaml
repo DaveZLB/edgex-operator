@@ -1,0 +1,17 @@
+apiVersion: v1
+appVersion: geneva
+description: A Helm Chart for EdgeX Geneva Version
+home: https://www.edgexfoundry.org
+icon: https://www.edgexfoundry.org/wp-content/uploads/sites/25/2017/04/logo_ef.png
+keywords:
+- Docker
+- EdgeX
+- Geneva
+maintainers:
+- email: zlibin@vmware.com
+  name: Libin Zhang
+name: EdgeX
+sources:
+- https://github.com/edgexfoundry/edgex-go
+- https://github.com/DaveZLB/edgex-helm
+version: 0.1.0

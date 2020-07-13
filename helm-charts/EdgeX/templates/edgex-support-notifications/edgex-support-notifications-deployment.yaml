@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    org.edgexfoundry.service: {{.Values.edgex.app.support.notifications}}
+  name: {{.Values.edgex.app.support.notifications}}
+spec:
+  replicas: {{.Values.edgex.replicas.support.notifications}}
+  selector:
+    matchLabels:
+      org.edgexfoundry.service: {{.Values.edgex.app.support.notifications}}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        org.edgexfoundry.service: {{.Values.edgex.app.support.notifications}}
+    spec:
+      containers:
+      - name: {{.Values.edgex.app.support.notifications}}
+        image: {{.Values.edgex.image.support.notifications.repository}}:{{.Values.edgex.image.support.notifications.tag}}
+        imagePullPolicy: {{.Values.edgex.image.support.notifications.pullPolicy}}
+        ports:
+        - containerPort: 48060
+        env:
+        - name: Service_Host
+          value: {{.Values.edgex.app.support.notifications}}
+        envFrom:
+        - configMapRef:
+            name: edgex-common-variables
+        readinessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: 48060
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: 48060
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 3
+      {{- if .Values.edgex.resources.support.notifications.enforceLimits }}
+        resources:
+          limits:
+            memory: {{ .Values.edgex.resources.support.notifications.limits.memory }}
+            cpu: {{ .Values.edgex.resources.support.notifications.limits.cpu }}
+          requests:
+            memory: {{ .Values.edgex.resources.support.notifications.requests.memory }}
+            cpu: {{ .Values.edgex.resources.support.notifications.requests.cpu }}
+      {{- end}}
+      hostname: {{.Values.edgex.app.support.notifications}}
+      restartPolicy: Always
+status: {}

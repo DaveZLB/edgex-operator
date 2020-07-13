@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    org.edgexfoundry.service: {{.Values.edgex.app.core.consul}}
+  name: {{.Values.edgex.app.core.consul}}
+spec:
+  replicas: {{.Values.edgex.replicas.core.consul}}
+  selector:
+    matchLabels:
+      org.edgexfoundry.service: {{.Values.edgex.app.core.consul}}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        org.edgexfoundry.service: {{.Values.edgex.app.core.consul}}
+    spec:
+      containers:
+      - name: {{.Values.edgex.app.core.consul}}
+        image: {{.Values.edgex.image.core.consul.repository}}:{{.Values.edgex.image.core.consul.tag}}
+        imagePullPolicy: {{.Values.edgex.image.core.consul.pullPolicy}}
+        ports:
+        - containerPort: 8400
+        - containerPort: 8500
+        envFrom:
+        - configMapRef:
+            name: edgex-common-variables
+        env:
+        - name: EDGEX_DB
+          value: "redis"
+        - name: EDGEX_SECURE
+          value: "false"
+        livenessProbe:
+          tcpSocket:
+            port: 8500
+          periodSeconds: 5
+        startupProbe:
+          tcpSocket:
+            port: 8500
+          initialDelaySeconds: 1
+          failureThreshold: 30
+          periodSeconds: 5
+
+      {{- if .Values.edgex.resources.core.consul.enforceLimits }}
+        resources:
+          limits:
+            memory: {{ .Values.edgex.resources.core.consul.limits.memory }}
+            cpu: {{ .Values.edgex.resources.core.consul.limits.cpu }}
+          requests:
+            memory: {{ .Values.edgex.resources.core.consul.requests.memory }}
+            cpu: {{ .Values.edgex.resources.core.consul.requests.cpu }}
+      {{- end}}
+        volumeMounts:
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      hostname: {{.Values.edgex.app.core.consul}}
+      restartPolicy: Always
+      volumes:
+      - name: consul-config
+        persistentVolumeClaim:
+          claimName: consul-config
+      - name: consul-data
+        persistentVolumeClaim:
+          claimName: consul-data
+status: {}
